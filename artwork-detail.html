@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artwork Details - My Decent Docent</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="artwork-detail.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <h1 class="app-title">My Decent Docent</h1>
+        <p class="app-subtitle">(Museum Explorer App)</p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="detail-main-container">
+        <!-- Back Navigation -->
+        <nav class="detail-navigation">
+            <button id="back-to-gallery" class="back-btn">
+                <span class="back-arrow">←</span>
+                <span class="back-text">Back to Gallery</span>
+            </button>
+        </nav>
+
+        <!-- Artwork Detail Content -->
+        <article class="artwork-detail">
+            <!-- Image Section -->
+            <section class="artwork-image-section">
+                <div class="main-image-container">
+                    <img id="artwork-main-image" class="artwork-main-image" src="" alt="Artwork">
+                    <div class="image-controls">
+                        <button class="zoom-btn" title="Zoom">🔍</button>
+                        <button class="fullscreen-btn" title="Fullscreen">⛶</button>
+                    </div>
+                </div>
+                
+                <!-- Additional Images Carousel -->
+                <div class="additional-images" id="additional-images">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- Information Section -->
+            <section class="artwork-info-section">
+                <!-- Primary Information -->
+                <div class="primary-info">
+                    <h1 id="artwork-title" class="artwork-title"></h1>
+                    <div class="artist-info">
+                        <h2 id="artist-name" class="artist-name"></h2>
+                        <p id="artist-bio" class="artist-bio"></p>
+                        <div class="artist-details">
+                            <span id="artist-nationality" class="artist-nationality"></span>
+                            <span id="artist-dates" class="artist-dates"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metadata Grid -->
+                <div class="metadata-grid">
+                    <!-- Object Details -->
+                    <div class="metadata-section">
+                        <h3 class="section-title">Object Details</h3>
+                        <dl class="metadata-list">
+                            <dt>Object Name</dt>
+                            <dd id="object-name"></dd>
+                            
+                            <dt>Date</dt>
+                            <dd id="object-date"></dd>
+                            
+                            <dt>Medium</dt>
+                            <dd id="medium"></dd>
+                            
+                            <dt>Dimensions</dt>
+                            <dd id="dimensions"></dd>
+                            
+                            <dt>Classification</dt>
+                            <dd id="classification"></dd>
+                        </dl>
+                    </div>
+
+                    <!-- Cultural Information -->
+                    <div class="metadata-section">
+                        <h3 class="section-title">Cultural Information</h3>
+                        <dl class="metadata-list">
+                            <dt>Culture</dt>
+                            <dd id="culture"></dd>
+                            
+                            <dt>Period</dt>
+                            <dd id="period"></dd>
+                            
+                            <dt>Dynasty</dt>
+                            <dd id="dynasty"></dd>
+                            
+                            <dt>Geography</dt>
+                            <dd id="geography"></dd>
+                        </dl>
+                    </div>
+
+                    <!-- Museum Information -->
+                    <div class="metadata-section">
+                        <h3 class="section-title">Museum Information</h3>
+                        <dl class="metadata-list">
+                            <dt>Department</dt>
+                            <dd id="department"></dd>
+                            
+                            <dt>Accession Number</dt>
+                            <dd id="accession-number"></dd>
+                            
+                            <dt>Credit Line</dt>
+                            <dd id="credit-line"></dd>
+                            
+                            <dt>Gallery</dt>
+                            <dd id="gallery-number"></dd>
+                        </dl>
+                    </div>
+
+                    <!-- Rights & Links -->
+                    <div class="metadata-section">
+                        <h3 class="section-title">Rights & Resources</h3>
+                        <dl class="metadata-list">
+                            <dt>Public Domain</dt>
+                            <dd id="public-domain"></dd>
+                            
+                            <dt>Rights & Reproduction</dt>
+                            <dd id="rights-reproduction"></dd>
+                        </dl>
+                        
+                        <div class="external-links">
+                            <a id="met-website-link" href="#" target="_blank" class="external-link">
+                                View on Met Website
+                            </a>
+                            <a id="wikidata-link" href="#" target="_blank" class="external-link">
+                                View on Wikidata
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tags Section -->
+                <div class="tags-section">
+                    <h3 class="section-title">Tags</h3>
+                    <div id="artwork-tags" class="tags-container">
+                        <!-- Tags populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Related Artworks -->
+                <div class="related-section">
+                    <h3 class="section-title">Related Artworks</h3>
+                    <div id="related-artworks" class="related-grid">
+                        <!-- Related artworks populated dynamically -->
+                    </div>
+                </div>
+            </section>
+        </article>
+
+        <!-- Loading State -->
+        <div id="detail-loading" class="detail-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading artwork details...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="detail-error" class="detail-error" style="display: none;">
+            <h2>Artwork Not Found</h2>
+            <p>Sorry, we couldn't load the details for this artwork.</p>
+            <button onclick="history.back()" class="retry-btn">Go Back</button>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="artwork-detail.js"></script>
+</body>
+</html>
