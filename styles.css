@@ -152,6 +152,13 @@ body {
     opacity: 0.7;
 }
 
+.card-date {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
 /* Skeleton Loading Styles */
 .skeleton-card {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -196,6 +203,57 @@ body {
     50% {
         opacity: 0.8;
     }
+}
+
+/* Error and No Results States */
+.error-message,
+.no-results {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.error-content,
+.no-results-content {
+    text-align: center;
+    padding: 2rem;
+}
+
+.error-content h3,
+.no-results-content h3 {
+    color: #e53e3e;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.error-content p,
+.no-results-content p {
+    color: #4a5568;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.retry-btn,
+.clear-search-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.retry-btn:hover,
+.clear-search-btn:hover {
+    background: #5a67d8;
 }
 
 /* Detailed View Styles */
