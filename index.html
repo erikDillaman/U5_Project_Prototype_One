@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Decent Docent - Museum Explorer App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <h1 class="app-title">My Decent Docent</h1>
+        <p class="app-subtitle">(Museum Explorer App)</p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Card View Section -->
+        <section id="card-view" class="card-view active">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search artwork, artist, era...">
+                <button id="search-btn" class="search-btn">Search</button>
+            </div>
+
+            <!-- Art Cards Grid -->
+            <div class="cards-grid" id="cards-grid">
+                <!-- Loading Skeletons (initially shown) -->
+                <div class="card skeleton-card">
+                    <div class="card-image skeleton-image"></div>
+                    <div class="card-content">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-location"></div>
+                    </div>
+                </div>
+                <div class="card skeleton-card">
+                    <div class="card-image skeleton-image"></div>
+                    <div class="card-content">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-location"></div>
+                    </div>
+                </div>
+                <div class="card skeleton-card">
+                    <div class="card-image skeleton-image"></div>
+                    <div class="card-content">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-location"></div>
+                    </div>
+                </div>
+                <div class="card skeleton-card">
+                    <div class="card-image skeleton-image"></div>
+                    <div class="card-content">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-location"></div>
+                    </div>
+                </div>
+                <div class="card skeleton-card">
+                    <div class="card-image skeleton-image"></div>
+                    <div class="card-content">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-location"></div>
+                    </div>
+                </div>
+                <div class="card skeleton-card">
+                    <div class="card-image skeleton-image"></div>
+                    <div class="card-content">
+                        <div class="skeleton-text skeleton-title"></div>
+                        <div class="skeleton-text skeleton-location"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed View Section -->
+        <section id="detailed-view" class="detailed-view">
+            <!-- Back Navigation -->
+            <button id="back-btn" class="back-btn">
+                <span class="back-arrow">←</span>
+            </button>
+
+            <!-- Detailed Content -->
+            <div class="detailed-content">
+                <div class="detailed-image-container">
+                    <img id="detailed-image" class="detailed-image" src="" alt="Artwork">
+                </div>
+                
+                <div class="detailed-info">
+                    <h2 id="detailed-title" class="detailed-title"></h2>
+                    <div class="detailed-meta">
+                        <div class="price-container">
+                            <span id="detailed-price" class="detailed-price"></span>
+                            <span class="original-price"></span>
+                        </div>
+                        <div class="rating-container">
+                            <div class="stars" id="detailed-rating"></div>
+                            <span class="rating-text">All Reviews</span>
+                        </div>
+                    </div>
+                    
+                    <div class="artist-info">
+                        <div class="artist-avatars" id="artist-avatars"></div>
+                    </div>
+                    
+                    <div class="detailed-description">
+                        <p id="detailed-description-text"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
