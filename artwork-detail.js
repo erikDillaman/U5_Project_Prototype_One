@@ -39,6 +39,11 @@ const artworkDetail = document.querySelector('.artwork-detail');
 // Metropolitan Museum API Configuration
 const MET_API_BASE = 'https://collectionapi.metmuseum.org/public/collection/v1';
 
+// Rate limiting and API monitoring
+let apiCallCount = 0;
+let rateLimitResetTime = null;
+let isRateLimited = false;
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
     initializeDetailPage();
@@ -77,17 +82,90 @@ function setupEventListeners() {
     }
 }
 
+// Enhanced API call function with rate limiting detection
+async function makeApiCall(url, retryCount = 0) {
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1 second base delay
+    
+    try {
+        // Check if we're currently rate limited
+        if (isRateLimited && rateLimitResetTime && Date.now() < rateLimitResetTime) {
+            const waitTime = rateLimitResetTime - Date.now();
+            console.log(`Rate limited. Waiting ${waitTime}ms before retry...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            isRateLimited = false;
+        }
+        
+        apiCallCount++;
+        console.log(`Detail Page API Call #${apiCallCount}: ${url}`);
+        
+        const response = await fetch(url);
+        
+        // Check for rate limiting
+        if (response.status === 429) {
+            console.warn('Rate limited by Met API (429)');
+            isRateLimited = true;
+            
+            // Check for Retry-After header
+            const retryAfter = response.headers.get('Retry-After');
+            if (retryAfter) {
+                const waitTime = parseInt(retryAfter) * 1000; // Convert to milliseconds
+                rateLimitResetTime = Date.now() + waitTime;
+                console.log(`Retry-After header: ${retryAfter}s`);
+            } else {
+                // Default exponential backoff
+                const waitTime = baseDelay * Math.pow(2, retryCount);
+                rateLimitResetTime = Date.now() + waitTime;
+                console.log(`Using exponential backoff: ${waitTime}ms`);
+            }
+            
+            if (retryCount < maxRetries) {
+                console.log(`Retrying in ${rateLimitResetTime - Date.now()}ms... (attempt ${retryCount + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, rateLimitResetTime - Date.now()));
+                return makeApiCall(url, retryCount + 1);
+            } else {
+                throw new Error('Rate limited: Maximum retries exceeded');
+            }
+        }
+        
+        // Check for other HTTP errors
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Log successful response
+        console.log(`Detail Page API Call successful: ${response.status}`);
+        
+        // Check response headers for rate limit info
+        const remaining = response.headers.get('X-RateLimit-Remaining');
+        const limit = response.headers.get('X-RateLimit-Limit');
+        const reset = response.headers.get('X-RateLimit-Reset');
+        
+        if (remaining !== null) {
+            console.log(`Rate limit info - Remaining: ${remaining}, Limit: ${limit}, Reset: ${reset}`);
+        }
+        
+        return response;
+        
+    } catch (error) {
+        if (retryCount < maxRetries && (error.name === 'TypeError' || error.message.includes('fetch'))) {
+            // Network error - retry with exponential backoff
+            const waitTime = baseDelay * Math.pow(2, retryCount);
+            console.log(`Network error, retrying in ${waitTime}ms... (attempt ${retryCount + 1}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return makeApiCall(url, retryCount + 1);
+        }
+        throw error;
+    }
+}
+
 // API Functions
 async function loadArtworkDetails(objectId) {
     try {
         showLoading();
         
         // Fetch artwork details from Met API
-        const response = await fetch(`${MET_API_BASE}/objects/${objectId}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await makeApiCall(`${MET_API_BASE}/objects/${objectId}`);
         
         const artworkData = await response.json();
         
@@ -100,7 +178,17 @@ async function loadArtworkDetails(objectId) {
         
     } catch (error) {
         console.error('Error loading artwork details:', error);
-        showError('Failed to load artwork details. The artwork may not exist or the API may be unavailable.');
+        
+        let errorMessage = 'Failed to load artwork details.';
+        if (error.message.includes('Rate limited')) {
+            errorMessage = 'API rate limit exceeded. Please wait a moment and try again.';
+        } else if (error.message.includes('HTTP 404')) {
+            errorMessage = 'This artwork was not found in the museum\'s collection.';
+        } else if (error.message.includes('HTTP')) {
+            errorMessage = 'The museum\'s API is temporarily unavailable. Please try again later.';
+        }
+        
+        showError(errorMessage);
     }
 }
 
@@ -272,7 +360,7 @@ async function loadRelatedArtworks(department, culture, currentObjectId) {
         let searchQuery = department || 'painting';
         
         const searchUrl = `${MET_API_BASE}/search?hasImages=true&departmentId=${getDepartmentId(department)}&q=${encodeURIComponent(searchQuery)}`;
-        const response = await fetch(searchUrl);
+        const response = await makeApiCall(searchUrl);
         const data = await response.json();
         
         if (data.objectIDs && data.objectIDs.length > 0) {
@@ -295,7 +383,7 @@ async function loadRelatedArtworkDetails(objectIds) {
     
     for (const id of objectIds) {
         try {
-            const response = await fetch(`${MET_API_BASE}/objects/${id}`);
+            const response = await makeApiCall(`${MET_API_BASE}/objects/${id}`);
             const artwork = await response.json();
             
             if (artwork.primaryImageSmall && artwork.title) {
@@ -311,6 +399,9 @@ async function loadRelatedArtworkDetails(objectIds) {
         
         // Break if we have enough artworks
         if (artworks.length >= 6) break;
+        
+        // Add small delay between requests to be respectful
+        await new Promise(resolve => setTimeout(resolve, 200));
     }
     
     return artworks;
@@ -415,12 +506,36 @@ function showError(message) {
     if (errorP) {
         errorP.textContent = message;
     }
+    
+    // Add API status info to error display
+    const errorDiv = detailError;
+    let statusDiv = errorDiv.querySelector('.api-status');
+    if (!statusDiv) {
+        statusDiv = document.createElement('div');
+        statusDiv.className = 'api-status';
+        errorDiv.appendChild(statusDiv);
+    }
+    statusDiv.innerHTML = `<small>API Calls Made: ${apiCallCount} | Rate Limited: ${isRateLimited ? 'Yes' : 'No'}</small>`;
 }
+
+// Debug function to check API status
+function getApiStatus() {
+    return {
+        apiCallCount,
+        isRateLimited,
+        rateLimitResetTime,
+        timeUntilReset: rateLimitResetTime ? Math.max(0, rateLimitResetTime - Date.now()) : 0
+    };
+}
+
+// Make debug function available globally
+window.getApiStatus = getApiStatus;
 
 // Export for potential module use
 window.ArtworkDetail = {
     loadArtworkDetails,
     showLoading,
     hideLoading,
-    showError
+    showError,
+    getApiStatus
 };
